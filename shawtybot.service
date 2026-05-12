@@ -4,14 +4,14 @@ After=network.target
 
 [Service]
 Type=simple
-User=YOUR_USERNAME
-WorkingDirectory=/path/to/shawtybot
-ExecStart=/path/to/shawtybot/venv/bin/python /path/to/shawtybot/bot.py
+User=root
+WorkingDirectory=/root/shawtybot
+ExecStart=/root/shawtybot/venv/bin/python /root/shawtybot/bot.py
 Restart=always
 RestartSec=10
-Environment=PATH=/path/to/shawtybot/venv/bin
-StandardOutput=append:/path/to/shawtybot/bot.log
-StandardError=append:/path/to/shawtybot/bot.log
+Environment=PATH=/root/shawtybot/venv/bin
+StandardOutput=append:/root/shawtybot/bot.log
+StandardError=append:/root/shawtybot/bot.log
 
 [Install]
 WantedBy=multi-user.target
