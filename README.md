@@ -1,125 +1,221 @@
-# SHAWTY VPN Bot
+<div align="center">
 
-Telegram бот для управления доступом к VPN сервису SHAWTY VPN через 3X-UI панель.
+# 🔐 SHAWTY VPN Bot
 
-## Технологии
+<img src="welcome_image.jpg" alt="SHAWTY VPN" width="200"/>
 
-- Python 3
-- python-telegram-bot v21+
-- aiohttp
-- aiosqlite
-- python-dotenv
-- qrcode + Pillow
+**Telegram-бот для управления доступом к VPN-сервису через 3X-UI панель**
 
-## Установка
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![python-telegram-bot](https://img.shields.io/badge/python--telegram--bot-v21+-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://github.com/python-telegram-bot/python-telegram-bot)
+[![SQLite](https://img.shields.io/badge/SQLite-aiosqlite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![VPS](https://img.shields.io/badge/Deploy-VPS%20%2F%20systemd-orange?style=for-the-badge&logo=linux&logoColor=white)]()
 
-1. Клонируйте репозиторий:
-```bash
-git clone <repository-url>
-cd shawtybot
-```
+</div>
 
-2. Создайте виртуальное окружение и установите зависимости:
-```bash
-python3 -m venv venv
-source venv/bin/activate  # Linux/Mac
-# или: venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-```
+---
 
-3. Скопируйте и настройте `.env` файл:
-```bash
-cp .env.example .env
-```
+## ✨ Возможности
 
-Отредактируйте `.env`:
-- `BOT_TOKEN` — токен вашего Telegram бота от @BotFather
-- `ADMIN_ID` — ваш Telegram ID (для админ-функций)
-- `ADMIN_USERNAME` — ваш Telegram username (для отображения в сообщениях)
-- `SUB_URL` — URL вашей subscription ссылки
-- `XUI_URL` — URL 3X-UI панели
-- `XUI_PATH` — путь до API 3X-UI панели
-- `XUI_BEARER_TOKEN` — Bearer токен из 3X-UI панели (Settings → Security → API Token)
+| Для пользователей | Для администратора |
+|---|---|
+| 📩 Отправка заявки на доступ | ✅ Одобрение / отклонение заявок |
+| 🔗 Получение subscription-ссылки | 👥 Просмотр всех пользователей |
+| 📱 QR-код для подключения | 🗑 Удаление пользователей |
+| 📋 Просмотр своей подписки | 📊 Статистика через health check |
+| — | ⚠️ Уведомления о подозрительной активности |
 
-## Конфигурация
+---
 
-### 3X-UI Панель
-- URL: https://proxy.shawtyvpn.online:51756
-- Path: /aVPl6vylEXefnfzmxY/
-- API Base: https://proxy.shawtyvpn.online:51756/panel/api
+## 🛡 Протоколы
 
-### Inbound IDs
-- ID 1 — SHAWTY VPN REALITY (VLESS+Reality+TCP, порт 443)
-- ID 2 — SHAWTY VPN CF (VLESS+WS+Cloudflare, порт 8050)
-- ID 3 — SHAWTY VPN WORKERS (VLESS+WS+Workers, порт 8080)
-- ID 4 — SHAWTY VPN RU REALITY (VLESS+Reality+TCP, порт 8443)
-- ID 5 — SHAWTY VPN SS (Shadowsocks 2022, порт 2052)
+Бот управляет клиентами сразу на **5 inbound-ах** 3X-UI:
 
-### Subscription
-- URL: https://sub.shawtyvpn.online:2096/sub/
+- **REALITY** — VLESS + Reality + TCP, порт `443` (основной)
+- **CF** — VLESS + WebSocket + Cloudflare, порт `8050`
+- **WORKERS** — VLESS + WebSocket + Workers, порт `8080`
+- **RU REALITY** — VLESS + Reality + TCP, порт `8443` (для РФ)
+- **Shadowsocks** — SS 2022, порт `2052`
 
-## Запуск
+---
 
-```bash
-python bot.py
-```
-
-## Функционал
-
-### Для пользователей:
-1. `/start` — отправка заявки на доступ
-2. После одобрения получает subscription ссылку + QR код
-3. Лимит устройств: 3
-
-### Для админа:
-1. Получает уведомления о новых заявках
-2. Кнопки «Одобрить» / «Отклонить»
-3. Просмотр списка пользователей
-4. Удаление пользователей
-
-## API Эндпоинты 3X-UI
-
-- GET `/panel/api/inbounds/list` — список inbound
-- GET `/panel/api/server/getNewUUID` — генерация UUID
-- POST `/panel/api/inbounds/addClient` — добавление клиента
-- POST `/panel/api/inbounds/:id/copyClients` — копирование клиента во все inbound
-- POST `/panel/api/inbounds/:id/delClient/:clientId` — удаление клиента
-- GET `/panel/api/inbounds/getSubLinks/:subId` — получение subscription ссылок
-- GET `/panel/api/inbounds/getClientLinks/:id/:email` — получение ссылок клиента
-
-## Структура проекта
+## 🗂 Структура проекта
 
 ```
 shawtybot/
-├── bot.py              # Основной файл бота
-├── xui_client.py       # Клиент для 3X-UI API
-├── database.py         # Модуль работы с базой данных
-├── keyboards.py        # Клавиатуры и кнопки
+├── bot.py              # Основная логика бота, хендлеры
+├── xui_client.py       # HTTP-клиент для 3X-UI API
+├── database.py         # Работа с SQLite (aiosqlite)
+├── keyboards.py        # Inline и Reply клавиатуры
 ├── requirements.txt    # Зависимости
-├── .env               # Конфигурация (не коммитить!)
-├── .env.example       # Пример конфигурации
-├── .gitignore         # Игнорируемые файлы
-├── temp/              # Временные файлы
-└── README.md          # Документация
+├── shawtybot.service   # systemd unit-файл
+├── run_bot.sh          # Скрипт запуска
+├── .env.example        # Пример конфигурации
+├── DEPLOY_VPS.md       # Инструкция по деплою
+└── README.md
 ```
 
-## Деплой на сервер
+---
 
-1. Скопируйте файлы на сервер
-2. Установите Python 3 и зависимости
-3. Настройте `.env` файл
-4. Запустите бота:
+## ⚙️ Установка
+
+### 1. Клонировать репозиторий
 
 ```bash
-python3 bot.py
+git clone https://github.com/akfoma/shawtybot.git
+cd shawtybot
 ```
 
-Для работы в фоне используйте `systemd`, `screen` или `pm2`.
+### 2. Создать виртуальное окружение
 
-## Безопасность
+```bash
+python3 -m venv venv
+source venv/bin/activate      # Linux / macOS
+# venv\Scripts\activate       # Windows
+pip install -r requirements.txt
+```
 
-- `.env` файл добавлен в `.gitignore`
-- Bearer токен хранится в переменных окружения
-- Пароли/токены никогда не захардкожены в коде
-- Подключение к XUI API через HTTPS
-- База данных SQLite хранится локально
+### 3. Настроить `.env`
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+---
+
+## 🔧 Конфигурация
+
+```env
+# Telegram
+BOT_TOKEN=your_bot_token_from_botfather
+ADMIN_ID=your_telegram_id
+ADMIN_USERNAME=@your_username
+
+# Сайт
+SITE_URL=https://your-vpn-site.com
+WELCOME_IMAGE_PATH=welcome_image.jpg
+
+# 3X-UI Panel
+XUI_URL=https://your-panel-domain:port
+XUI_PATH=/your-secret-path
+XUI_BEARER_TOKEN=your_bearer_token
+
+# Подписка
+SUB_URL=https://your-sub-domain/sub/
+
+# Inbound IDs (соответствуют вашей 3X-UI панели)
+INBOUND_REALITY=1
+INBOUND_CF=2
+INBOUND_WORKERS=3
+INBOUND_RU_REALITY=4
+INBOUND_SS=5
+
+# Лимиты
+DEVICE_LIMIT=3
+RATE_LIMIT_WINDOW=30
+RATE_LIMIT_MAX_EVENTS=8
+REQUEST_COOLDOWN_SECONDS=20
+
+# Health Check
+HEALTH_CHECK_PORT=8588
+HEALTH_CHECK_ENABLED=true
+```
+
+> **Получить Bearer Token:** 3X-UI панель → Settings → Security → API Token
+
+---
+
+## 🚀 Деплой на VPS (systemd)
+
+```bash
+# Скопировать unit-файл
+sudo cp shawtybot.service /etc/systemd/system/
+
+# Включить и запустить
+sudo systemctl daemon-reload
+sudo systemctl enable shawtybot
+sudo systemctl start shawtybot
+
+# Проверить статус
+sudo systemctl status shawtybot
+```
+
+### Обновление бота
+
+```bash
+cd ~/shawtybot
+git pull
+source venv/bin/activate
+pip install -r requirements.txt
+sudo systemctl restart shawtybot
+```
+
+### Просмотр логов
+
+```bash
+# Через journalctl
+sudo journalctl -u shawtybot -f
+
+# Через файл логов
+tail -f ~/shawtybot/bot.log
+```
+
+---
+
+## 🔒 Безопасность
+
+- Все токены хранятся только в `.env` (добавлен в `.gitignore`)
+- `html.escape()` на всех пользовательских данных
+- Валидация Telegram ID, username, текстового ввода
+- Rate limiting: скользящее окно + cooldown на заявки + debounce на кнопки
+- Уведомления администратору при подозрительной активности
+- Защита от параллельной обработки дублирующих заявок
+- Подключение к XUI API только через HTTPS с Bearer-токеном
+
+---
+
+## 🏥 Health Check
+
+Бот поднимает HTTP-эндпоинт для мониторинга:
+
+```
+GET http://your-server:8588/health
+```
+
+Пример ответа:
+```json
+{
+  "status": "healthy",
+  "users_count": 42,
+  "pending_requests": 3,
+  "timestamp": 1715000000
+}
+```
+
+---
+
+## 🛠 Технологии
+
+| Библиотека | Назначение |
+|---|---|
+| `python-telegram-bot` v21+ | Telegram Bot API |
+| `aiohttp` | Async HTTP клиент для 3X-UI |
+| `aiosqlite` | Async SQLite база данных |
+| `python-dotenv` | Загрузка переменных окружения |
+| `qrcode` + `Pillow` | Генерация QR-кодов |
+
+---
+
+## 📄 Лицензия
+
+MIT License — используй свободно.
+
+---
+
+<div align="center">
+
+Made with 💗 for **SHAWTY VPN**
+
+</div>
